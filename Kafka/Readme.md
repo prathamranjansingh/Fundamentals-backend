@@ -3,7 +3,7 @@
 
 ## The Apache Kafka Handbook – How to Get Started Using Kafka
 
-(D:/GitRepos/Fundamentals-backend/Kafka/assets/image%20copy.png)
+![Kafka Image](assets/image%20copy.png)
 
 Apache Kafka is an open-source event streaming platform that can transport huge volumes of data at very low latency. Companies like LinkedIn, Uber, and Netflix use Kafka to process trillions of events and petabytes of data each day.
 
