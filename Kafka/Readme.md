@@ -3,22 +3,14 @@
 
 ## The Apache Kafka Handbook – How to Get Started Using Kafka
 
-![Kafka Image](assets/image%20copy.png)
-
 Apache Kafka is an open-source event streaming platform that can transport huge volumes of data at very low latency. Companies like LinkedIn, Uber, and Netflix use Kafka to process trillions of events and petabytes of data each day.
 
 Kafka was originally developed at LinkedIn to help handle their real-time data feeds. It's now maintained by the Apache Software Foundation and is widely adopted in the industry, being used by 80% of Fortune 100 companies.
 
-### Why Should You Learn Apache Kafka?
+### Use Cases for Kafka:
 
-Kafka lets you:
-- Publish and subscribe to streams of events
-- Store streams of events in the same order they happened
-- Process streams of events in real-time
+![Kafka Image](assets/image%20copy.png)
 
-Kafka helps you efficiently connect diverse data sources with the many different systems that might need to use that data.
-
-#### Use Cases for Kafka:
 - Personalizing recommendations for customers
 - Notifying passengers of flight delays
 - Payment processing in banking
@@ -34,66 +26,60 @@ For example, Pinterest uses Kafka to handle up to 40 million events per second.
 - **Replicated**: Data is copied in multiple locations to protect it from a single point of failure.
 - **Fast**: Optimized for high throughput, making effective use of disk storage and batched network requests.
 
-### This Article Will:
-- Introduce you to the core concepts behind Kafka
-- Show you how to install Kafka on your own computer
-- Get you started with the Kafka Command Line Interface (CLI)
-- Help you build a simple Java application that produces and consumes events via Kafka
-
-### Things the Article Won't Cover:
-- More advanced Kafka topics, such as security, performance, and monitoring
-- Deploying a Kafka cluster to a server
-- Using managed Kafka services like Amazon MSK or Confluent Cloud
-
 ## Table of Contents
-1. [Event Streaming and Event-Driven Architectures](#event-streaming-and-event-driven-architectures)
-2. [Core Kafka Concepts](#core-kafka-concepts)
-    - [Event Messages in Kafka](#event-messages-in-kafka)
-    - [Topics in Kafka](#topics-in-kafka)
-    - [Partitions in Kafka](#partitions-in-kafka)
-    - [Offsets in Kafka](#offsets-in-kafka)
-    - [Brokers in Kafka](#brokers-in-kafka)
-    - [Replication in Kafka](#replication-in-kafka)
-    - [Producers in Kafka](#producers-in-kafka)
-    - [Consumers in Kafka](#consumers-in-kafka)
-    - [Consumer Groups in Kafka](#consumer-groups-in-kafka)
-    - [Kafka Zookeeper](#kafka-zookeeper)
-3. [How to Install Kafka on Your Computer](#how-to-install-kafka-on-your-computer)
-4. [How to Start Zookeeper and Kafka](#how-to-start-zookeeper-and-kafka)
-5. [The Kafka CLI](#the-kafka-cli)
-    - [How to List Topics](#how-to-list-topics)
-    - [How to Create a Topic](#how-to-create-a-topic)
-    - [How to Describe Topics](#how-to-describe-topics)
-    - [How to Partition a Topic](#how-to-partition-a-topic)
-    - [How to Set a Replication Factor](#how-to-set-a-replication-factor)
-    - [How to Delete a Topic](#how-to-delete-a-topic)
-    - [How to Use kafka-console-producer](#how-to-use-kafka-console-producer)
-    - [How to Use kafka-console-consumer](#how-to-use-kafka-console-consumer)
-    - [How to Use kafka-consumer-groups](#how-to-use-kafka-consumer-groups)
-6. [How to Build a Kafka Client App with Java](#how-to-build-a-kafka-client-app-with-java)
-    - [How to Set Up the Project](#how-to-set-up-the-project)
-    - [How to Install the Dependencies](#how-to-install-the-dependencies)
-    - [How to Create a Kafka Producer](#how-to-create-a-kafka-producer)
-    - [How to Send Multiple Messages and Use Callbacks](#how-to-send-multiple-messages-and-use-callbacks)
-    - [How to Create a Kafka Consumer](#how-to-create-a-kafka-consumer)
-    - [How to Shut Down the Consumer](#how-to-shut-down-the-consumer)
-7. [Where to Take it From Here](#where-to-take-it-from-here)
+
 
 ## Event Streaming and Event-Driven Architectures
 
-An event is a record that something happened, as well as information about what happened. For example: a customer placed an order, a bank approved a transaction, inventory management updated stock levels.
+Imagine you run Amazon, an e-commerce giant. Millions of customers place orders, make payments, and track shipments every second. How does Amazon manage all these events efficiently? This is where event streaming and event-driven architecture come in.
 
-Event streaming is the process of capturing events in real-time from sources (such as web applications, databases, or sensors) to create streams of events. These streams are potentially unending sequences of records.
+An event is simply a record of something happening.
+
+**Example:**
+- A customer places an order on Amazon → Order Placed Event
+- The payment is processed → Payment Success Event
+- The package is shipped → Order Shipped Event
+
+These events are captured and processed in real-time.
+
+Event streaming is the process of continuously capturing and processing events as they happen. Instead of waiting for reports at the end of the day, Amazon can immediately react to every customer action.
+
+**Example:**
+- You order an iPhone on Amazon.
+- Amazon’s system instantly updates:
+    - Reduces stock in the inventory.
+    - Sends an email confirmation.
+    - Updates delivery tracking.
+
+All these actions are triggered by events happening in real-time.
+
+Event-Driven Architecture (EDA) is a software design pattern where components react to events rather than following a fixed, sequential flow. Instead of services directly calling each other (as in traditional request-response systems), they communicate asynchronously through events.
 
 As applications have become more complex, many organizations have adopted an event-driven architecture for their applications. This architecture helps ensure that if part of your application goes down, other parts won't also fail.
 
 ## Core Kafka Concepts
 
-Kafka has become one of the most popular ways to implement event streaming and event-driven architectures. But it does have a bit of a learning curve and you need to understand a couple of concepts before you can make effective use of it.
+![Description](assets/image_copy_2.png)
+
+
+Kafka has become one of the most popular ways to implement event streaming and event-driven architectures. 
+These core concepts are:
+
+event messages
+topics
+partitions
+offsets
+brokers
+producers
+consumers
+consumer groups
+Zookeeper
 
 ### Event Messages in Kafka
 
 When you write data to Kafka, or read data from it, you do this in the form of messages. You'll also see them called events or records.
+
+![Kafka Message](assets/image_3.png)
 
 A message consists of:
 - a key
