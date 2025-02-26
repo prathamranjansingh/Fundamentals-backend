@@ -76,19 +76,20 @@ console.log(n);  // Output: 10 (global 'n' remains unchanged)
 10
 ```
 
+### Variable Scope in JavaScript
 
-Variable Scope in JavaScript
 1. Global Scope
 2. Function Scope
 3. Block Scope
 
+### JavaScript Hoisting
 
-JavaScript Hoisting
-Hoisting refers to the behaviour where JavaScript moves the declarations of variables, functions, and classes to the top of their scope during the compilation phase. This can sometimes lead to surprising results, especially when using var, let, const, or function expressions.
+Hoisting refers to the behaviour where JavaScript moves the declarations of variables, functions, and classes to the top of their scope during the compilation phase. This can sometimes lead to surprising results, especially when using `var`, `let`, `const`, or function expressions.
 
-Hoisting applies to variable and function declarations.
-Initializations are not hoisted, they are only declarations.
-‘var’ variables are hoisted with undefined, while ‘let’ and ‘const’ are hoisted but remain in the Temporal Dead Zone until initialized.
+- Hoisting applies to variable and function declarations.
+- Initializations are not hoisted, only declarations.
+- `var` variables are hoisted with `undefined`, while `let` and `const` are hoisted but remain in the Temporal Dead Zone until initialized.
 
-Temporal Dead Zone (TDZ)
-The Temporal Dead Zone (TDZ) is a critical concept in JavaScript hoisting. It refers to the period between the entering of a scope (such as a function or block) and the actual initialization of a variable declared with let or const. During this time, any reference to the variable before its initialization will throw a ReferenceError.
+### Temporal Dead Zone (TDZ)
+
+The Temporal Dead Zone (TDZ) is a critical concept in JavaScript hoisting. It refers to the period between the entering of a scope (such as a function or block) and the actual initialization of a variable declared with `let` or `const`. During this time, any reference to the variable before its initialization will throw a `ReferenceError`.
