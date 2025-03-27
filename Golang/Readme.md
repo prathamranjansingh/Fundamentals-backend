@@ -290,6 +290,109 @@ var y float64 = float64(x)
 
 By understanding variables and data types, developers can write efficient and type-safe code in Go.
 
+
+## Conditional Statements
+
+### If-Else Statement
+
+```go
+package main
+import "fmt"
+
+func main() {
+  age := 18
+
+  if age >= 18 {
+    fmt.Println("You are an adult")
+  } else {
+    fmt.Println("You are a minor")
+  }
+}
+```
+
+**Key Points**:
+- No parentheses `()` around conditions.
+- Curly braces `{}` are mandatory.
+- `else` must be on the same line as the closing `}` of the `if` block.
+
+---
+
+### If with Short Statement
+
+You can declare and use a variable inside the `if` statement.
+
+```go
+if num := 10; num%2 == 0 {
+  fmt.Println("Even number")
+} else {
+  fmt.Println("Odd number")
+}
+```
+
+---
+
+### Switch Statement
+
+`Switch` is an alternative to multiple `if-else` statements.
+
+#### 1. Basic Switch
+
+```go
+package main
+import "fmt"
+
+func main() {
+  day := 3
+
+  switch day {
+  case 1:
+    fmt.Println("Monday")
+  case 2:
+    fmt.Println("Tuesday")
+  case 3:
+    fmt.Println("Wednesday")
+  default:
+    fmt.Println("Other day")
+  }
+}
+```
+
+#### 2. Multiple Cases in One
+
+```go
+switch day := "Saturday"; day {
+case "Saturday", "Sunday":
+  fmt.Println("Weekend")
+default:
+  fmt.Println("Weekday")
+}
+```
+
+#### 3. Switch without Expression
+
+`Switch` can work like a clean `if-else` chain.
+
+```go
+x := 15
+
+switch {
+case x < 10:
+  fmt.Println("Less than 10")
+case x >= 10 && x <= 20:
+  fmt.Println("Between 10 and 20")
+default:
+  fmt.Println("Greater than 20")
+}
+```
+
+---
+
+### Loops in Go
+
+Go has only one looping construct: `for`.
+
+
+
 ## Comparison with Other Languages
 
 - **Go vs. Rust**: While Go emphasizes simplicity and developer productivity, Rust focuses on memory safety and performance. Rust often executes faster than Go due to its zero-cost abstractions and lack of garbage collection.
