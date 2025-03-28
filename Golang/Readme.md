@@ -387,9 +387,108 @@ default:
 
 ---
 
-### Loops in Go
+## Loops in Go
 
 Go has only one looping construct: `for`.
+
+### Basic For Loop
+
+```go
+for i := 0; i < 5; i++ {
+  fmt.Println(i)
+}
+```
+
+**Key Points**:
+- **Initialization**: `i := 0`
+- **Condition**: `i < 5`
+- **Increment**: `i++`
+
+---
+
+### While-Style Loop (For Without Init & Post)
+
+```go
+i := 0
+for i < 5 {
+  fmt.Println(i)
+  i++
+}
+```
+
+---
+
+### Infinite Loop
+
+```go
+for {
+  fmt.Println("Infinite loop")
+}
+```
+
+---
+
+### Breaking a Loop
+
+```go
+for i := 1; i <= 10; i++ {
+  if i == 5 {
+    break // Exit the loop
+  }
+  fmt.Println(i)
+}
+```
+
+---
+
+### Skipping Iterations with `continue`
+
+```go
+for i := 1; i <= 5; i++ {
+  if i == 3 {
+    continue // Skip iteration when i == 3
+  }
+  fmt.Println(i)
+}
+```
+
+---
+
+## Range in Go
+
+The `range` keyword is used to iterate over slices, arrays, maps, and strings.
+
+### Range Over an Array/Slice
+
+```go
+nums := []int{10, 20, 30}
+
+for index, value := range nums {
+  fmt.Println("Index:", index, "Value:", value)
+}
+```
+
+---
+
+### Range Over a String
+
+```go
+for i, char := range "Golang" {
+  fmt.Printf("Index: %d, Character: %c\n", i, char)
+}
+```
+
+---
+
+### Range Over a Map
+
+```go
+mp := map[string]int{"Alice": 25, "Bob": 30}
+
+for key, value := range mp {
+  fmt.Println(key, "is", value, "years old")
+}
+```
 
 
 
