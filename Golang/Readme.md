@@ -261,6 +261,11 @@ This is only allowed inside functions, not at the package level.
      LastName  string
   }
 
+  type Person struct {
+     FirstName := "Pratham"
+     LastName := "Singh"  // Wrong Way
+  }
+
   p := Person{FirstName: "John", LastName: "Doe"} // ✅ Correct
   ```
 
@@ -609,6 +614,244 @@ for key, value := range mp {
 }
 ```
 
+## How Go Handles Errors Differently
+
+Unlike other languages like Java, JavaScript, or Python, Go does not use `try/catch` blocks. Instead, Go treats errors as regular values that functions return. This means you need to check the error manually after every function call.
+
+### The Error Type in Go
+
+Errors in Go are defined using an interface:
+
+```go
+type error interface {
+  Error() string
+}
+```
+
+Any type that implements this `Error()` method can be used as an error.
+
+---
+
+## Creating Errors in Go
+
+Errors can be created using either the `errors` package or the `fmt` package.
+
+### Using the `errors` Package (Simple Error)
+
+```go
+import "errors"
+
+func DoSomething() error {
+  return errors.New("something didn't work")
+}
+```
+
+This returns a static error message.
+
+### Using `fmt.Errorf` (Dynamic Error)
+
+If you want to include dynamic values in your error messages:
+
+```go
+import "fmt"
+
+func Divide(a, b int) (int, error) {
+  if b == 0 {
+    return 0, fmt.Errorf("can't divide '%d' by zero", a)
+  }
+  return a / b, nil
+}
+```
+
+Here, `fmt.Errorf` allows you to format the error message with values like `a`.
+
+---
+
+## Checking for Specific Errors
+
+Instead of just checking if `err != nil`, Go provides a better way to handle specific errors.
+
+### Using Sentinel Errors
+
+You can define specific errors as variables and check for them:
+
+```go
+import (
+  "errors"
+  "fmt"
+)
+
+var ErrDivideByZero = errors.New("divide by zero")
+
+func Divide(a, b int) (int, error) {
+  if b == 0 {
+    return 0, ErrDivideByZero
+  }
+  return a / b, nil
+}
+
+func main() {
+  a, b := 10, 0
+  result, err := Divide(a, b)
+  if err != nil {
+    if errors.Is(err, ErrDivideByZero) {
+      fmt.Println("divide by zero error")
+    } else {
+      fmt.Printf("unexpected division error: %s\n", err)
+    }
+    return
+  }
+
+  fmt.Printf("%d / %d = %d\n", a, b, result)
+}
+```
+
+`errors.Is(err, ErrDivideByZero)` checks if the error matches `ErrDivideByZero`. This is useful when handling known errors differently.
+
+---
+
+## Creating Custom Error Types
+
+If you need extra information in an error, you can create a custom struct that implements the `error` interface.
+
+```go
+type DivisionError struct {
+  IntA int
+  IntB int
+  Msg  string
+}
+
+func (e *DivisionError) Error() string {
+  return e.Msg
+}
+
+func Divide(a, b int) (int, error) {
+  if b == 0 {
+    return 0, &DivisionError{
+      Msg: fmt.Sprintf("cannot divide '%d' by zero", a),
+      IntA: a, IntB: b,
+    }
+  }
+  return a / b, nil
+}
+
+func main() {
+  a, b := 10, 0
+  result, err := Divide(a, b)
+  if err != nil {
+    var divErr *DivisionError
+    if errors.As(err, &divErr) {
+      fmt.Printf("%d / %d is not mathematically valid: %s\n",
+        divErr.IntA, divErr.IntB, divErr.Error())
+    } else {
+      fmt.Printf("unexpected division error: %s\n", err)
+    }
+    return
+  }
+
+  fmt.Printf("%d / %d = %d\n", a, b, result)
+}
+```
+
+The struct `DivisionError` stores extra data (`IntA`, `IntB`). `errors.As(err, &divErr)` checks if an error is of type `DivisionError`.
+
+---
+
+## Wrapping Errors (Go 1.13+)
+
+Errors in real-world applications often "bubble up" through multiple function calls. Go allows wrapping errors to add extra context.
+
+### The Problem (Without Wrapping)
+
+Consider this simple user database example:
+
+```go
+func FindUser(username string) (*User, error) {
+  return db.Find(username)
+}
+
+func SetUserAge(u *User, age int) error {
+  return db.SetAge(u, age)
+}
+
+func FindAndSetUserAge(username string, age int) error {
+  user, err := FindUser(username)
+  if err != nil {
+    return err  // No context on where the error came from
+  }
+
+  if err = SetUserAge(user, age); err != nil {
+    return err  // No context again
+  }
+
+  return nil
+}
+```
+
+If an error occurs, we don’t know which function caused it.
+
+### The Solution (With Wrapping)
+
+By using `fmt.Errorf` with `%w`, we can add context to errors:
+
+```go
+func FindUser(username string) (*User, error) {
+  u, err := db.Find(username)
+  if err != nil {
+    return nil, fmt.Errorf("FindUser: failed executing db query: %w", err)
+  }
+  return u, nil
+}
+
+func SetUserAge(u *User, age int) error {
+  if err := db.SetAge(u, age); err != nil {
+    return fmt.Errorf("SetUserAge: failed executing db update: %w", err)
+  }
+  return nil
+}
+
+func FindAndSetUserAge(username string, age int) error {
+  user, err := FindUser(username)
+  if err != nil {
+    return fmt.Errorf("FindAndSetUserAge: %w", err)
+  }
+
+  if err = SetUserAge(user, age); err != nil {
+    return fmt.Errorf("FindAndSetUserAge: %w", err)
+  }
+
+  return nil
+}
+
+func main() {
+  if err := FindAndSetUserAge("bob@example.com", 21); err != nil {
+    fmt.Println("failed finding or updating user:", err)
+    return
+  }
+
+  fmt.Println("successfully updated user's age")
+}
+```
+
+**Output with Wrapping**:
+
+```
+failed finding or updating user: FindAndSetUserAge: SetUserAge: failed executing db update: malformed request
+```
+
+The error now shows the full function call stack, helping in debugging errors quickly.
+
+---
+
+## When to Wrap vs. When Not to Wrap
+
+### ✅ When to Wrap Errors:
+- Always wrap errors before returning them in a function.
+- Helps trace back the origin of an error.
+
+### ❌ When Not to Wrap Errors:
+- If exposing internal details is a security or privacy risk.
+- If the error message doesn't add value to the caller.
 
 
 ## Comparison with Other Languages
