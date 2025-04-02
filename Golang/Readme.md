@@ -854,6 +854,216 @@ The error now shows the full function call stack, helping in debugging errors qu
 - If the error message doesn't add value to the caller.
 
 
+## Defer, Panic, and Recover in Go
+
+### 1. Defer
+
+#### What is `defer` in Go?
+
+The `defer` keyword is used to delay the execution of a function until just before the surrounding function exits. It’s useful for cleaning up resources, like closing a file or unlocking a mutex.
+
+Think of `defer` like setting an alarm that goes off at the end of a function.
+
+#### Example 1: How `defer` works
+
+```go
+package main
+import "fmt"
+
+func main() {
+  fmt.Println("one")
+  defer fmt.Println("three") // This will run just before main() exits
+  fmt.Println("two")
+}
+```
+
+**Output**:
+```
+one
+two
+three
+```
+
+**Explanation**:
+- The statement `defer fmt.Println("three")` does not execute immediately.
+- It gets stored and runs just before `main()` exits.
+
+#### Example 2: Multiple `defer` statements (Last In, First Out)
+
+```go
+package main
+import "fmt"
+
+func main() {
+  defer fmt.Println("one")
+  defer fmt.Println("two")
+  defer fmt.Println("three")
+}
+```
+
+**Output**:
+```
+three
+two
+one
+```
+
+**Explanation**:
+- When multiple `defer` statements are used, they are executed in reverse order (LIFO - Last In, First Out).
+- This is useful when cleaning up multiple resources in an orderly way.
+
+---
+
+### 2. Panic
+
+#### What is `panic` in Go?
+
+A `panic` immediately stops the execution of a function and begins an unwinding process. This means that:
+- The function stops running at that point.
+- Any deferred function calls still execute before the program crashes.
+- If the `panic` is not recovered, the entire program crashes.
+
+`panic` is used in cases where the program cannot recover from an error (e.g., dividing by zero, accessing invalid memory).
+
+#### Example 3: How `panic` works
+
+```go
+package main
+import "fmt"
+
+func main() {
+  fmt.Println("one")
+  defer fmt.Println("three") // This will run before panic
+  panic("A panic happened!") // Program stops here
+  fmt.Println("four") // This line never runs
+}
+```
+
+**Output**:
+```
+one
+three
+panic: A panic happened!
+```
+
+**Explanation**:
+- The `panic` stops the program immediately.
+- But before stopping, Go executes any deferred functions (which is why "three" still gets printed).
+- The "four" statement never runs because the program crashes before it reaches that point.
+
+#### Example 4: Panic due to divide by zero
+
+```go
+package main
+import "fmt"
+
+func main() {
+  x := 0
+  y := 20
+  fmt.Println(y / x) // Division by zero triggers panic
+}
+```
+
+**Output**:
+```
+panic: runtime error: integer divide by zero
+```
+
+**Explanation**:
+- The Go compiler automatically panics when it detects a division by zero.
+- The program crashes because there's no recovery mechanism in place.
+
+---
+
+### 3. Recover
+
+#### What is `recover` in Go?
+
+The `recover` function is used to catch a `panic` and allow the program to continue running instead of crashing.
+- `recover()` only works inside a `defer` function.
+- If there is no `panic`, `recover()` returns `nil`.
+
+Think of `recover()` as an emergency brake that prevents the program from crashing when something goes wrong.
+
+#### Example 5: Using `recover` to handle panic
+
+```go
+package main
+import "fmt"
+
+func main() {
+  fmt.Println("Program started")
+  
+  defer func() {
+    if r := recover(); r != nil {
+      fmt.Println("Recovering from panic:", r)
+    }
+  }()
+
+  fmt.Println("About to panic...")
+  panic("Something went wrong!") // This would normally crash the program
+
+  fmt.Println("This will not be printed") // Never executes
+}
+```
+
+**Output**:
+```
+Program started
+About to panic...
+Recovering from panic: Something went wrong!
+```
+
+**Explanation**:
+- The `defer` function catches the `panic` using `recover()`.
+- Instead of the program crashing, `recover()` restores normal execution.
+- The "Recovering from panic" message is printed instead of a crash.
+
+#### Example 6: Handling divide-by-zero with `recover`
+
+```go
+package main
+import "fmt"
+
+func main() {
+  x := 0
+  y := 20
+  handleDivision(x, y)
+}
+
+func handleDivision(x int, y int) {
+  defer func() {
+    if r := recover(); r != nil {
+      fmt.Println("Recovering from panic:", r)
+      fmt.Println("Proceeding with alternative logic...")
+      alternativeDivision(x, y)
+    }
+  }()
+
+  result := y / x // This causes panic (divide by zero)
+  fmt.Println("Result:", result) // This never runs
+}
+
+func alternativeDivision(x int, y int) {
+  fmt.Println("Skipping division, only multiplying instead:")
+  fmt.Println("Multiply:", x*y)
+}
+```
+
+**Output**:
+```
+Recovering from panic: runtime error: integer divide by zero
+Proceeding with alternative logic...
+Skipping division, only multiplying instead:
+Multiply: 0
+```
+
+**Explanation**:
+- Instead of crashing, `recover()` catches the `panic`.
+- The program skips the division and runs an alternative calculation instead.
+
+---
+
 ## Comparison with Other Languages
 
 - **Go vs. Rust**: While Go emphasizes simplicity and developer productivity, Rust focuses on memory safety and performance. Rust often executes faster than Go due to its zero-cost abstractions and lack of garbage collection.
