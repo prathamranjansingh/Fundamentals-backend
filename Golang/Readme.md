@@ -1064,6 +1064,139 @@ Multiply: 0
 
 ---
 
+## Dependency Management in Go
+
+In Go, managing dependencies is a crucial part of maintaining a project. Dependencies are external packages or libraries that your code relies on. Go provides a robust module system to handle dependencies efficiently.
+
+### What Are Dependencies?
+
+Dependencies are external packages or libraries that your Go project uses. Over time, you may need to add, update, or remove dependencies to ensure your project functions correctly.
+
+---
+
+### How Does Go Manage Dependencies?
+
+Go uses a module system to track and manage dependencies. A module is a collection of Go packages defined by a `go.mod` file, which records all dependencies and their versions. Go tools automate dependency tracking and management.
+
+---
+
+### Common Steps to Manage Dependencies
+
+#### 1. **Create a Module (If Not Already Created)**
+
+To initialize a module in your project directory, run:
+
+```bash
+go mod init example/mymodule
+```
+
+This creates a `go.mod` file where dependencies are tracked.
+
+---
+
+#### 2. **Add a Dependency**
+
+To add an external package, use:
+
+```bash
+go get example.com/theirmodule
+```
+
+This updates the `go.mod` file and downloads the required module.
+
+---
+
+#### 3. **Use the Package in Your Code**
+
+Import the package at the beginning of your Go file:
+
+```go
+import "example.com/theirmodule"
+```
+
+---
+
+#### 4. **Upgrade or Downgrade a Dependency**
+
+- Upgrade to a specific version:
+
+  ```bash
+  go get example.com/theirmodule@v1.3.4
+  ```
+
+- Get the latest version:
+
+  ```bash
+  go get example.com/theirmodule@latest
+  ```
+
+---
+
+#### 5. **Check for Updates**
+
+To see if newer versions of dependencies exist, run:
+
+```bash
+go list -m -u all
+```
+
+---
+
+#### 6. **Remove Unused Dependencies**
+
+- Remove a specific package:
+
+  ```bash
+  go get example.com/theirmodule@none
+  ```
+
+- Clean up all unused dependencies:
+
+  ```bash
+  go mod tidy
+  ```
+
+---
+
+### Advanced Dependency Management
+
+#### 1. **Use Local Modules**
+
+If you're developing a module locally and don't want to download it, use:
+
+```bash
+go mod edit -replace=example.com/theirmodule=../theirmodule
+```
+
+---
+
+#### 2. **Use a Forked Repository**
+
+If you modified a package and want to use your own version, use:
+
+```bash
+go mod edit -replace=example.com/theirmodule=example.com/myfork/theirmodule
+```
+
+---
+
+#### 3. **Use a Specific Git Commit**
+
+To use a package from a particular commit, run:
+
+```bash
+go get example.com/theirmodule@4cf76c2
+```
+
+---
+
+### Important Files
+
+- **`go.mod`**: Tracks dependencies and their versions.
+- **`go.sum`**: Stores checksums to verify dependency integrity.
+
+By following these steps and leveraging Go's module system, you can efficiently manage dependencies in your projects, ensuring stability and maintainability.
+
 ## Comparison with Other Languages
 
 - **Go vs. Rust**: While Go emphasizes simplicity and developer productivity, Rust focuses on memory safety and performance. Rust often executes faster than Go due to its zero-cost abstractions and lack of garbage collection.
